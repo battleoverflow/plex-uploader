@@ -4,12 +4,12 @@ A simple desktop application built to upload content to a local Plex server with
 NOTE: This approach requires SSH to be configured on the Plex server and you must be connected to the same network as the Plex server.
 
 > [!WARNING]  
-> Plex Uploader is still in early development.
+> Plex Uploader is still in early development. MacOS is not currently supported.
 
 > [!IMPORTANT]  
 > This project does require Tkinter to be installed when working with the source code. This must be installed at the system level.
 
-If you'd like to run the source code yourself, you can do by running the following command:
+If you'd like to run the source code yourself, you can do so by running the following command:
 
 ```bash
 python3 plex-uploader.py
