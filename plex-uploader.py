@@ -87,7 +87,7 @@ class PlexUploader:
             # fg="#FFFFFF",
             bg="#18181b",
             text="Learn More",
-            command=lambda: messagebox.showinfo("About", "Created by https://github.com/azazelm3dj3d")
+            command=lambda: messagebox.showinfo("About", "Created by https://github.com/battleoverflow")
         ).pack(padx=10, pady=20)
 
     def main(self) -> None:
