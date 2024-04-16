@@ -91,8 +91,12 @@ class PlexUploader:
         # Configure the Tkinter UI
         self.configure_ui()
 
+        if is_mac():
+            messagebox.showwarning("Warning", "MacOS is not supported.")
+            return 0
+
         # Only run the SCP transfer if a file is present
-        if FILE_NAME != StringVar():
+        if FILE_NAME != StringVar() and not is_mac():
             # If unable to connect via SSH with the provided credentials, it times out at 30 seconds
             ssh_client = SSHClient()
             ssh_client.connect(hostname=self.hostname, username=self.username, password=self.password, timeout=30)
