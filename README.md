@@ -14,3 +14,5 @@ If you'd like to run the source code yourself, you can do so by running the foll
 ```bash
 python3 plex-uploader.py
 ```
+
+Add all SSH credentials to the `.env` file in the same working directory as the executable.

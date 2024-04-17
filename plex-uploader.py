@@ -1,8 +1,11 @@
-import platform
+import platform, os
 from tkinter import *
 from tkinter import messagebox
-from paramiko import SSHClient
+from paramiko import AutoAddPolicy, SSHClient
 from scp import SCPClient
+from dotenv import load_dotenv
+
+load_dotenv()
 
 def is_mac() -> bool:
     """
@@ -14,15 +17,15 @@ def is_mac() -> bool:
 
     return False
 
-# Only import the TkinterDnD library is we're not on MacOS
-if not is_mac():
-    from tkinterdnd2 import *
-
 def scp_progress(filename, size, sent) -> None:
     """
     Track the progress of the SCP transfer.
     """
     print(f"{filename}'s progress: {float(sent)/float(size)*100:.2f}   \r")
+
+# Only import the TkinterDnD library is we're not on MacOS
+if not is_mac():
+    from tkinterdnd2 import *
 
 if is_mac():
     tk_dnd = Tk()
@@ -39,18 +42,33 @@ class PlexUploader:
     """
     Plex Upload is a simple desktop application built to upload content to a local Plex server without the need to ever touch a terminal.
     """
+
     def __init__(self) -> None:
-        # TODO: These values could be customizable in the UI
-        self.hostname = "192.168.1.0"
-        self.username = "root"
-        self.password = "root"
-        self.remote_path = "/opt/plex"
+        self.hostname = os.getenv("SSH_HOSTNAME")
+        self.username = os.getenv("SSH_USERNAME")
+        self.password = os.getenv("SSH_PASSWORD")
+        self.remote_path = os.getenv("SSH_REMOTE_PATH")
+
+        print(self.hostname, self.username, self.password, self.remote_path)
 
     def get_file_event(self, event) -> None:
         """
         Access the file event from the media file being dropped into the application.
         """
+
+        # The filename shows with parenthesis for some reason, so we need to strip those from the string
         FILE_NAME.set(event.data)
+
+        # Only run the SCP transfer if a file is present
+        if FILE_NAME != StringVar() and not is_mac():
+            # If unable to connect via SSH with the provided credentials, it times out at 30 seconds
+            ssh_client = SSHClient()
+            ssh_client.set_missing_host_key_policy(AutoAddPolicy())
+            ssh_client.connect(hostname=self.hostname, username=self.username, password=self.password, timeout=30)
+            scp = SCPClient(ssh_client.get_transport(), progress=scp_progress)
+            scp.put(files=FILE_NAME.get()[1:-1], recursive=False, remote_path=self.remote_path)
+            scp.close()
+
         return None
     
     def configure_ui(self) -> None:
@@ -94,15 +112,6 @@ class PlexUploader:
         if is_mac():
             messagebox.showwarning("Warning", "MacOS is not supported.")
             return 0
-
-        # Only run the SCP transfer if a file is present
-        if FILE_NAME != StringVar() and not is_mac():
-            # If unable to connect via SSH with the provided credentials, it times out at 30 seconds
-            ssh_client = SSHClient()
-            ssh_client.connect(hostname=self.hostname, username=self.username, password=self.password, timeout=30)
-            scp = SCPClient(ssh_client.get_transport(), progress=scp_progress)
-            scp.put(files=FILE_NAME, recursive=False, remote_path=self.remote_path)
-            scp.close()
 
         tk_dnd.mainloop()
 
