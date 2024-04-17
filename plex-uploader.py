@@ -21,7 +21,13 @@ def scp_progress(filename, size, sent) -> None:
     """
     Track the progress of the SCP transfer.
     """
-    print(f"{filename}'s progress: {float(sent)/float(size)*100:.2f}   \r")
+
+    if platform.system() == 'Windows':
+        os.system('cls')
+    else:
+        os.system("clear")
+
+    print(f"File: {filename}\nProgress: {float(sent)/float(size)*100:.2f}\r\n")
 
 # Only import the TkinterDnD library is we're not on MacOS
 if not is_mac():
@@ -48,8 +54,6 @@ class PlexUploader:
         self.username = os.getenv("SSH_USERNAME")
         self.password = os.getenv("SSH_PASSWORD")
         self.remote_path = os.getenv("SSH_REMOTE_PATH")
-
-        print(self.hostname, self.username, self.password, self.remote_path)
 
     def get_file_event(self, event) -> None:
         """
