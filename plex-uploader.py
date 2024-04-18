@@ -38,11 +38,22 @@ if is_mac():
 else:
     tk_dnd = TkinterDnD.Tk()
 
+WIDTH = 400
+HEIGHT = 300
+
+# Startup the app in the center of the screen
+screen_width = tk_dnd.winfo_screenwidth()
+screen_height = tk_dnd.winfo_screenheight()
+
+x = (screen_width/2) - (WIDTH/2)
+y = (screen_height/2) - (HEIGHT/2)
+
 tk_dnd.title("Plex Uploader")
-tk_dnd.geometry("800x600")
+tk_dnd.geometry("%dx%d+%d+%d" % (WIDTH, HEIGHT, x, y))
 tk_dnd.config(bg="#18181b")
 
 FILE_NAME = StringVar()
+VERSION = "0.1"
 
 class PlexUploader:
     """
@@ -82,29 +93,26 @@ class PlexUploader:
         frame = Frame(tk_dnd)
         frame.pack()
 
+        # Place to drag and drop the media file
+        label_frame = LabelFrame(tk_dnd, text="Upload Media", fg="#FFFFFF", bg="#18181b")
+        Label(label_frame, fg="#FFFFFF", bg="#18181b", text="Drag and drop the media below.").pack(fill=BOTH, expand=True)
+        label_frame.pack(fill=BOTH, expand=False, padx=10, pady=10)
+
         # This is where the file name should be displayed after dropping into the media section
-        Label(tk_dnd, text="Media path", fg="#FFFFFF", bg="#18181b").pack(anchor=NW, padx=10)
-        entry_box = Entry(tk_dnd, textvar=FILE_NAME, width=80)
-        entry_box.pack(fill=X, padx=10)
+        Label(tk_dnd, text="Media Path", fg="#FFFFFF", bg="#18181b").pack(anchor=NW, padx=10)
+        entry_box = Entry(tk_dnd, textvar=FILE_NAME, state="disabled", borderwidth=2, relief="groove")
+        entry_box.pack(fill=BOTH, padx=10, expand=True)
 
         # The user must press "Enter" after dragging and dropping the media file
         # The "Enter" will intiate the upload
         if not is_mac():
             entry_box.drop_target_register(DND_FILES)
-            entry_box.dnd_bind('<<Drop>>', self.get_file_event)
+            entry_box.dnd_bind('<<DropEnter>>', self.get_file_event)
 
-        # Place to drag and drop the media file
-        label_frame = LabelFrame(tk_dnd, text="Upload Media", fg="#FFFFFF", bg="#18181b")
-        Label(label_frame, fg="#FFFFFF", bg="#18181b", text="Drag and drop the media above.").pack(fill=BOTH, expand=True)
-        label_frame.pack(fill=BOTH, expand=True, padx=10, pady=10)
-
-        Button(
-            tk_dnd,
-            fg="#FFFFFF",
-            bg="#18181b",
-            text="Learn More",
-            command=lambda: messagebox.showinfo("About", "Created by https://github.com/battleoverflow")
-        ).pack(padx=10, pady=20)
+        # Verison info
+        label_frame = LabelFrame(tk_dnd, text="Version", fg="#FFFFFF", bg="#18181b")
+        Label(label_frame, fg="#FFFFFF", bg="#18181b", text=f"v{VERSION}\nCreated by battleoverflow").pack(fill=BOTH, expand=True)
+        label_frame.pack(fill=BOTH, expand=False, padx=10, pady=10)
 
     def main(self) -> None:
         """
@@ -115,7 +123,7 @@ class PlexUploader:
 
         if is_mac():
             messagebox.showwarning("Warning", "MacOS is not supported.")
-            return 0
+            return None
 
         tk_dnd.mainloop()
 
