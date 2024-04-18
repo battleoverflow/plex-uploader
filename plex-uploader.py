@@ -100,14 +100,13 @@ class PlexUploader:
 
         # This is where the file name should be displayed after dropping into the media section
         Label(tk_dnd, text="Media Path", fg="#FFFFFF", bg="#18181b").pack(anchor=NW, padx=10)
-        entry_box = Entry(tk_dnd, textvar=FILE_NAME, state="disabled", borderwidth=2, relief="groove")
+        entry_box = Entry(tk_dnd, textvar=FILE_NAME, borderwidth=2, relief="groove")
         entry_box.pack(fill=BOTH, padx=10, expand=True)
 
         # The user must press "Enter" after dragging and dropping the media file
-        # The "Enter" will intiate the upload
         if not is_mac():
             entry_box.drop_target_register(DND_FILES)
-            entry_box.dnd_bind('<<DropEnter>>', self.get_file_event)
+            entry_box.dnd_bind('<<Drop>>', self.get_file_event)
 
         # Verison info
         label_frame = LabelFrame(tk_dnd, text="Version", fg="#FFFFFF", bg="#18181b")
